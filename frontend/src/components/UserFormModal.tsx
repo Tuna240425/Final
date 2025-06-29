@@ -24,7 +24,7 @@ export default function UserFormModal({
     e.preventDefault();
 
     try {
-      await axios.post("http://localhost:3000/api/send-quote", {
+      await axios.post("https://test-backend-ureq.onrender.com", {
         name,
         phone,
         email,
