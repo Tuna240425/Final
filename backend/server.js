@@ -7,7 +7,15 @@ const path = require("path");
 const PDFDocument = require("pdfkit");
 
 const app = express();
-app.use(cors());
+
+// ✅ Vercel frontend 배포 주소를 여기에 넣으세요
+const allowedOrigin = "https://final-brown-phi.vercel.app/"; // 예: https://hero-app.vercel.app
+
+// CORS 허용 도메인 설정
+app.use(cors({
+  origin: allowedOrigin,
+}));
+
 app.use(express.json());
 
 app.post("/api/send-quote", async (req, res) => {
@@ -58,7 +66,7 @@ app.post("/api/send-quote", async (req, res) => {
         ],
       });
 
-      fs.unlinkSync(filePath);
+      fs.unlinkSync(filePath); // 생성한 PDF 삭제
       res.status(200).json({ message: "메일 전송 완료" });
     });
   } catch (err) {
@@ -67,4 +75,6 @@ app.post("/api/send-quote", async (req, res) => {
   }
 });
 
-app.listen(3000, () => console.log("✅ 백엔드 실행: http://localhost:3000"));
+// 포트 설정 (로컬에서 테스트할 때만 사용)
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`✅ 백엔드 실행 중: http://localhost:${PORT}`));
