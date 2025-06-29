@@ -8,24 +8,28 @@ const PDFDocument = require("pdfkit");
 
 const app = express();
 
-// ✅ Vercel frontend 배포 주소를 여기에 넣으세요
-const allowedOrigin = "https://final-brown-phi.vercel.app/"; // 예: https://hero-app.vercel.app
-
-// CORS 허용 도메인 설정
+// ✅ CORS 설정 (프론트 배포 주소로 수정)
+const FRONTEND_URL = process.env.FRONTEND_URL || "https://your-frontend.vercel.app";
 app.use(cors({
-  origin: allowedOrigin,
+  origin: FRONTEND_URL,
 }));
 
 app.use(express.json());
+
+// ✅ uploads 폴더 자동 생성
+const uploadsDir = path.join(__dirname, "uploads");
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
+}
 
 app.post("/api/send-quote", async (req, res) => {
   console.log("📥 수신된 데이터:", req.body);
   const { name, email, phone, serviceType } = req.body;
 
   try {
-    // PDF 생성
+    // ✅ PDF 경로 설정
     const fileName = `quote_${Date.now()}.pdf`;
-    const filePath = path.join(__dirname, "uploads", fileName);
+    const filePath = path.join(uploadsDir, fileName);
 
     const doc = new PDFDocument({ size: "A4" });
     doc.registerFont('NotoSansKR', path.join(__dirname, 'fonts', 'NotoSansKR-Medium.ttf'));
@@ -66,15 +70,16 @@ app.post("/api/send-quote", async (req, res) => {
         ],
       });
 
-      fs.unlinkSync(filePath); // 생성한 PDF 삭제
+      fs.unlinkSync(filePath); // 파일 삭제
       res.status(200).json({ message: "메일 전송 완료" });
     });
   } catch (err) {
-    console.error(err);
+    console.error("❌ 오류:", err);
     res.status(500).json({ message: "메일 전송 실패", error: err });
   }
 });
 
-// 포트 설정 (로컬에서 테스트할 때만 사용)
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`✅ 백엔드 실행 중: http://localhost:${PORT}`));
+app.listen(PORT, () => {
+  console.log(`✅ 서버 실행 중: http://localhost:${PORT}`);
+});
