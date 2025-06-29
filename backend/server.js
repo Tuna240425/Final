@@ -9,10 +9,12 @@ const PDFDocument = require("pdfkit");
 const app = express();
 
 // ✅ CORS 설정 (프론트 배포 주소로 수정)
-const FRONTEND_URL = process.env.FRONTEND_URL || "https://your-frontend.vercel.app";
+const cors = require("cors");
 app.use(cors({
-  origin: FRONTEND_URL,
+  origin: process.env.FRONTEND_URL, // Vercel 주소
+  credentials: true
 }));
+
 
 app.use(express.json());
 
